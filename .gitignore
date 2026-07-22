@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Local secrets and overrides ###
+.env
+application-local.properties
+
+### OS temporary files ###
+.DS_Store
+Thumbs.db
+*.tmp
