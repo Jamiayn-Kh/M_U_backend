@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import mn.mungunurlal.auth.dto.LoginRequest;
 import mn.mungunurlal.auth.dto.LoginResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,5 +26,10 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request
     ) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<String> me(Authentication authentication) {
+        return ResponseEntity.ok(authentication.getName());
     }
 }
