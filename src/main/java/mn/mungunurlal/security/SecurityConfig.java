@@ -42,7 +42,12 @@ public class SecurityConfig {
                                 "/api/v1/auth/login",
                                 "/actuator/health"
                         ).permitAll()
-                        .anyRequest().authenticated()
+
+                        .requestMatchers("/api/v1/users/**")
+                        .hasRole("ADMIN")
+
+                        .anyRequest()
+                        .authenticated()
                 )
 
                 .addFilterBefore(
