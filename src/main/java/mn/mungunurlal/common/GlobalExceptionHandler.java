@@ -2,6 +2,7 @@ package mn.mungunurlal.common;
 
 import mn.mungunurlal.user.exception.UsernameAlreadyExistsException;
 import mn.mungunurlal.moldorder.exception.InvalidMoldOrderException;
+import mn.mungunurlal.moldorder.exception.MoldOrderNotFoundException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,4 +46,20 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(body);
     }
+
+    @ExceptionHandler(MoldOrderNotFoundException.class)
+public ResponseEntity<Map<String, Object>> handleMoldOrderNotFound(
+        MoldOrderNotFoundException exception
+) {
+    Map<String, Object> body = Map.of(
+            "timestamp", LocalDateTime.now().toString(),
+            "status", HttpStatus.NOT_FOUND.value(),
+            "error", "Not Found",
+            "message", exception.getMessage()
+    );
+
+    return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(body);
+}
 }

@@ -4,47 +4,76 @@ import mn.mungunurlal.moldorder.domain.MoldOrder;
 import mn.mungunurlal.moldorder.domain.MoldOrderItem;
 import mn.mungunurlal.moldorder.domain.MoldOrderStatus;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public record MoldOrderResponse(
         Long id,
-        SellerInfo seller,
+        UserInfo seller,
+        UserInfo cityHandler,
         MoldOrderStatus status,
         String note,
         List<ItemInfo> items,
+        TransportInfo transport,
         LocalDateTime createdAt,
-        LocalDateTime sentAt
+        LocalDateTime sentAt,
+        LocalDateTime receivedAt,
+        LocalDateTime transportedAt,
+        LocalDateTime completedAt
 ) {
 
     public static MoldOrderResponse from(MoldOrder order) {
+        UserInfo sellerInfo = UserInfo.from(order.getSeller());
+
+        UserInfo cityHandlerInfo = order.getCityHandler() == null
+                ? null
+                : UserInfo.from(order.getCityHandler());
+
         List<ItemInfo> itemResponses = order.getItems()
                 .stream()
                 .map(ItemInfo::from)
                 .toList();
 
-        SellerInfo sellerInfo = new SellerInfo(
-                order.getSeller().getId(),
-                order.getSeller().getUsername(),
-                order.getSeller().getFullName()
+        TransportInfo transportInfo = new TransportInfo(
+                order.getDepartureDate(),
+                order.getDepartureTime(),
+                order.getBusNumber(),
+                order.getDriverPhone(),
+                order.getTransportNote()
         );
 
         return new MoldOrderResponse(
                 order.getId(),
                 sellerInfo,
+                cityHandlerInfo,
                 order.getStatus(),
                 order.getNote(),
                 itemResponses,
+                transportInfo,
                 order.getCreatedAt(),
-                order.getSentAt()
+                order.getSentAt(),
+                order.getReceivedAt(),
+                order.getTransportedAt(),
+                order.getCompletedAt()
         );
     }
 
-    public record SellerInfo(
+    public record UserInfo(
             Long id,
             String username,
             String fullName
     ) {
+        public static UserInfo from(
+                mn.mungunurlal.user.domain.User user
+        ) {
+            return new UserInfo(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getFullName()
+            );
+        }
     }
 
     public record ItemInfo(
@@ -61,5 +90,14 @@ public record MoldOrderResponse(
                     item.isStoneRequired()
             );
         }
+    }
+
+    public record TransportInfo(
+            LocalDate departureDate,
+            LocalTime departureTime,
+            String busNumber,
+            String driverPhone,
+            String note
+    ) {
     }
 }

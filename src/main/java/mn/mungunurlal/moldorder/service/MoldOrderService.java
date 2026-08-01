@@ -6,6 +6,7 @@ import mn.mungunurlal.moldorder.dto.CreateMoldOrderRequest;
 import mn.mungunurlal.moldorder.dto.MoldOrderItemRequest;
 import mn.mungunurlal.moldorder.dto.MoldOrderResponse;
 import mn.mungunurlal.moldorder.exception.InvalidMoldOrderException;
+import mn.mungunurlal.moldorder.exception.MoldOrderNotFoundException;
 import mn.mungunurlal.moldorder.repository.MoldOrderRepository;
 import mn.mungunurlal.user.domain.User;
 import mn.mungunurlal.user.domain.UserRole;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -36,12 +38,7 @@ public class MoldOrderService {
             String username,
             CreateMoldOrderRequest request
     ) {
-        User seller = userRepository.findByUsername(username)
-                .orElseThrow(() ->
-                        new InvalidMoldOrderException(
-                                "Нэвтэрсэн хэрэглэгч олдсонгүй"
-                        )
-                );
+        User seller = getUser(username);
 
         if (seller.getRole() != UserRole.PROVINCE_SELLER) {
             throw new InvalidMoldOrderException(
@@ -70,6 +67,70 @@ public class MoldOrderService {
         MoldOrder savedOrder = moldOrderRepository.save(order);
 
         return MoldOrderResponse.from(savedOrder);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MoldOrderResponse> getOrders(String username) {
+        User user = getUser(username);
+
+        List<MoldOrder> orders;
+
+        if (user.getRole() == UserRole.PROVINCE_SELLER) {
+            orders = moldOrderRepository
+                    .findAllBySellerIdOrderByCreatedAtDesc(user.getId());
+        } else if (
+                user.getRole() == UserRole.ADMIN
+                        || user.getRole() == UserRole.CITY_HANDLER
+        ) {
+            orders = moldOrderRepository
+                    .findAllByOrderByCreatedAtDesc();
+        } else {
+            throw new InvalidMoldOrderException(
+                    "Хэвний хүсэлт харах эрхгүй байна"
+            );
+        }
+
+        return orders.stream()
+                .map(MoldOrderResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public MoldOrderResponse getOrder(
+            Long orderId,
+            String username
+    ) {
+        User user = getUser(username);
+
+        MoldOrder order = moldOrderRepository
+                .findWithDetailsById(orderId)
+                .orElseThrow(() ->
+                        new MoldOrderNotFoundException(orderId)
+                );
+
+        if (user.getRole() == UserRole.PROVINCE_SELLER
+                && !order.getSeller().getId().equals(user.getId())) {
+            throw new InvalidMoldOrderException(
+                    "Бусдын хэвний хүсэлтийг харах эрхгүй байна"
+            );
+        }
+
+        if (user.getRole() == UserRole.CRAFTSMAN) {
+            throw new InvalidMoldOrderException(
+                    "Хэвний хүсэлт харах эрхгүй байна"
+            );
+        }
+
+        return MoldOrderResponse.from(order);
+    }
+
+    private User getUser(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new InvalidMoldOrderException(
+                                "Нэвтэрсэн хэрэглэгч олдсонгүй"
+                        )
+                );
     }
 
     private void validateDuplicateCodes(
