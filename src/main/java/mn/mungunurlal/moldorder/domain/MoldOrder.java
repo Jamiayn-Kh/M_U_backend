@@ -180,4 +180,22 @@ public class MoldOrder {
 
         return value.trim();
     }
+
+    public void send() {
+    if (items.isEmpty()) {
+        throw new IllegalStateException(
+                "Хэвний кодгүй хүсэлтийг илгээх боломжгүй"
+        );
+    }
+
+    if (status != MoldOrderStatus.DRAFT) {
+        throw new IllegalStateException(
+                "Зөвхөн DRAFT төлөвтэй хүсэлтийг илгээх боломжтой"
+        );
+    }
+
+    status = MoldOrderStatus.SENT;
+    sentAt = LocalDateTime.now();
+}
+
 }

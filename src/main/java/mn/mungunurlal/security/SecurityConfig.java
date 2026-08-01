@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpMethod;
 
 import java.util.List;
 
@@ -43,18 +44,31 @@ public class SecurityConfig {
                         )
                 )
 
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/v1/auth/login",
-                                "/actuator/health"
-                        ).permitAll()
+.authorizeHttpRequests(auth -> auth
+        .requestMatchers(
+                "/api/v1/auth/login",
+                "/actuator/health"
+        ).permitAll()
 
-                        .requestMatchers("/api/v1/users/**")
-                        .hasRole("ADMIN")
+        .requestMatchers("/api/v1/users/**")
+        .hasRole("ADMIN")
 
-                        .anyRequest()
-                        .authenticated()
-                )
+        .requestMatchers(
+                HttpMethod.POST,
+                "/api/v1/mold-orders"
+        )
+        .hasRole("PROVINCE_SELLER")
+
+        .requestMatchers("/api/v1/mold-orders/**")
+        .hasAnyRole(
+                "ADMIN",
+                "PROVINCE_SELLER",
+                "CITY_HANDLER"
+        )
+
+        .anyRequest()
+        .authenticated()
+)
 
                 .addFilterBefore(
                         jwtAuthenticationFilter,
