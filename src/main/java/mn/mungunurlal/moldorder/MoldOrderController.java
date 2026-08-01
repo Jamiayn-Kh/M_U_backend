@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import mn.mungunurlal.moldorder.dto.TransportOrderRequest;
 
 import java.util.List;
 
@@ -92,6 +93,21 @@ public ResponseEntity<MoldOrderResponse> startProcessing(
             moldOrderService.startProcessing(
                     id,
                     authentication.getName()
+            )
+    );
+}
+
+@PatchMapping("/{id}/transport")
+public ResponseEntity<MoldOrderResponse> transportOrder(
+        @PathVariable Long id,
+        Authentication authentication,
+        @Valid @RequestBody TransportOrderRequest request
+) {
+    return ResponseEntity.ok(
+            moldOrderService.transportOrder(
+                    id,
+                    authentication.getName(),
+                    request
             )
     );
 }

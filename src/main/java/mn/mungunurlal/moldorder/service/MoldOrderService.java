@@ -13,6 +13,7 @@ import mn.mungunurlal.user.domain.UserRole;
 import mn.mungunurlal.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import mn.mungunurlal.moldorder.dto.TransportOrderRequest;
 
 import java.util.HashSet;
 import java.util.List;
@@ -209,6 +210,50 @@ public MoldOrderResponse startProcessing(
 
     try {
         order.startProcessing();
+    } catch (IllegalStateException exception) {
+        throw new InvalidMoldOrderException(
+                exception.getMessage()
+        );
+    }
+
+    return MoldOrderResponse.from(order);
+}
+
+@Transactional
+public MoldOrderResponse transportOrder(
+        Long orderId,
+        String username,
+        TransportOrderRequest request
+) {
+    User cityHandler = getUser(username);
+
+    if (cityHandler.getRole() != UserRole.CITY_HANDLER) {
+        throw new InvalidMoldOrderException(
+                "Зөвхөн хотын хэрэглэгч хүсэлтийг унаанд тавина"
+        );
+    }
+
+    MoldOrder order = moldOrderRepository
+            .findWithDetailsById(orderId)
+            .orElseThrow(() ->
+                    new MoldOrderNotFoundException(orderId)
+            );
+
+    if (order.getCityHandler() == null
+            || !order.getCityHandler().getId().equals(cityHandler.getId())) {
+        throw new InvalidMoldOrderException(
+                "Та энэ хүсэлтийг хүлээн аваагүй байна"
+        );
+    }
+
+    try {
+        order.markTransported(
+                request.departureDate(),
+                request.departureTime(),
+                request.busNumber(),
+                request.driverPhone(),
+                request.note()
+        );
     } catch (IllegalStateException exception) {
         throw new InvalidMoldOrderException(
                 exception.getMessage()

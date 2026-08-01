@@ -218,5 +218,26 @@ public void startProcessing() {
 
     status = MoldOrderStatus.IN_PROCESS;
 }
+public void markTransported(
+        LocalDate departureDate,
+        LocalTime departureTime,
+        String busNumber,
+        String driverPhone,
+        String transportNote
+) {
+    if (status != MoldOrderStatus.IN_PROCESS) {
+        throw new IllegalStateException(
+                "Зөвхөн IN_PROCESS төлөвтэй хүсэлтийг унаанд тавих боломжтой"
+        );
+    }
+
+    this.departureDate = departureDate;
+    this.departureTime = departureTime;
+    this.busNumber = busNumber.trim();
+    this.driverPhone = driverPhone.trim();
+    this.transportNote = normalizeOptionalText(transportNote);
+    this.status = MoldOrderStatus.TRANSPORTED;
+    this.transportedAt = LocalDateTime.now();
+}
 
 }

@@ -62,7 +62,8 @@ public class SecurityConfig {
 .requestMatchers(
         HttpMethod.PATCH,
         "/api/v1/mold-orders/*/receive",
-        "/api/v1/mold-orders/*/process"
+        "/api/v1/mold-orders/*/process",
+        "/api/v1/mold-orders/*/transport"
 )
 .hasRole("CITY_HANDLER")
 
