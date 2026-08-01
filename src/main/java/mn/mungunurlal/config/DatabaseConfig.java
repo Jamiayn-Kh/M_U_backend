@@ -18,14 +18,11 @@ public class DatabaseConfig {
 
     @EventListener(ApplicationReadyEvent.class)
     public void runFlywayMigration() {
-        System.out.println("===== Running Flyway Migration =====");
         Flyway flyway = Flyway.configure()
                 .dataSource(dataSource)
                 .locations("classpath:db/migration")
                 .baselineOnMigrate(true)
                 .load();
-        
         flyway.migrate();
-        System.out.println("===== Flyway Migration Completed =====");
     }
 }
