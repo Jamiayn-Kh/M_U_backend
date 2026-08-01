@@ -240,4 +240,15 @@ public void markTransported(
     this.transportedAt = LocalDateTime.now();
 }
 
+public void complete() {
+    if (status != MoldOrderStatus.TRANSPORTED) {
+        throw new IllegalStateException(
+                "Зөвхөн TRANSPORTED төлөвтэй хүсэлтийг хүлээн авснаар дуусгах боломжтой"
+        );
+    }
+
+    status = MoldOrderStatus.COMPLETED;
+    completedAt = LocalDateTime.now();
+}
+
 }

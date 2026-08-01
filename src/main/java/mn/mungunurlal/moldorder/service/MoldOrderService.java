@@ -262,4 +262,40 @@ public MoldOrderResponse transportOrder(
 
     return MoldOrderResponse.from(order);
 }
+
+@Transactional
+public MoldOrderResponse completeOrder(
+        Long orderId,
+        String username
+) {
+    User seller = getUser(username);
+
+    if (seller.getRole() != UserRole.PROVINCE_SELLER) {
+        throw new InvalidMoldOrderException(
+                "Зөвхөн аймгийн борлуулагч хүсэлтийг хүлээн авч дуусгана"
+        );
+    }
+
+    MoldOrder order = moldOrderRepository
+            .findWithDetailsById(orderId)
+            .orElseThrow(() ->
+                    new MoldOrderNotFoundException(orderId)
+            );
+
+    if (!order.getSeller().getId().equals(seller.getId())) {
+        throw new InvalidMoldOrderException(
+                "Та энэ хэвний хүсэлтийг үүсгээгүй байна"
+        );
+    }
+
+    try {
+        order.complete();
+    } catch (IllegalStateException exception) {
+        throw new InvalidMoldOrderException(
+                exception.getMessage()
+        );
+    }
+
+    return MoldOrderResponse.from(order);
+}
 }

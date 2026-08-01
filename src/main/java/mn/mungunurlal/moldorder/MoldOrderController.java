@@ -111,4 +111,17 @@ public ResponseEntity<MoldOrderResponse> transportOrder(
             )
     );
 }
+
+@PatchMapping("/{id}/complete")
+public ResponseEntity<MoldOrderResponse> completeOrder(
+        @PathVariable Long id,
+        Authentication authentication
+) {
+    return ResponseEntity.ok(
+            moldOrderService.completeOrder(
+                    id,
+                    authentication.getName()
+            )
+    );
+}
 }
