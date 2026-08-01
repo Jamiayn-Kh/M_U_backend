@@ -59,6 +59,12 @@ public class SecurityConfig {
         )
         .hasRole("PROVINCE_SELLER")
 
+        .requestMatchers(
+                HttpMethod.PATCH,
+                "/api/v1/mold-orders/*/receive"
+        )
+        .hasRole("CITY_HANDLER")
+
         .requestMatchers("/api/v1/mold-orders/**")
         .hasAnyRole(
                 "ADMIN",

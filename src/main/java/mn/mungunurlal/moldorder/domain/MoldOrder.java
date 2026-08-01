@@ -197,5 +197,16 @@ public class MoldOrder {
     status = MoldOrderStatus.SENT;
     sentAt = LocalDateTime.now();
 }
+public void receive(User cityHandler) {
+    if (status != MoldOrderStatus.SENT) {
+        throw new IllegalStateException(
+                "Зөвхөн SENT төлөвтэй хүсэлтийг хүлээн авах боломжтой"
+        );
+    }
+
+    this.cityHandler = cityHandler;
+    this.status = MoldOrderStatus.RECEIVED;
+    this.receivedAt = LocalDateTime.now();
+}
 
 }

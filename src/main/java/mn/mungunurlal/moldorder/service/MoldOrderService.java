@@ -151,4 +151,33 @@ public class MoldOrderService {
             }
         }
     }
+    @Transactional
+public MoldOrderResponse receiveOrder(
+        Long orderId,
+        String username
+) {
+    User cityHandler = getUser(username);
+
+    if (cityHandler.getRole() != UserRole.CITY_HANDLER) {
+        throw new InvalidMoldOrderException(
+                "Зөвхөн хотын харилцагч хүсэлтийг хүлээн авна"
+        );
+    }
+
+    MoldOrder order = moldOrderRepository
+            .findWithDetailsById(orderId)
+            .orElseThrow(() ->
+                    new MoldOrderNotFoundException(orderId)
+            );
+
+    try {
+        order.receive(cityHandler);
+    } catch (IllegalStateException exception) {
+        throw new InvalidMoldOrderException(
+                exception.getMessage()
+        );
+    }
+
+    return MoldOrderResponse.from(order);
+}
 }

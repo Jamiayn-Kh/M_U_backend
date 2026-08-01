@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 import java.util.List;
 
@@ -55,16 +56,29 @@ public class MoldOrderController {
         );
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<MoldOrderResponse> getOrder(
-            @PathVariable Long id,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                moldOrderService.getOrder(
-                        id,
-                        authentication.getName()
-                )
-        );
-    }
+@GetMapping("/{id}")
+public ResponseEntity<MoldOrderResponse> getOrder(
+        @PathVariable Long id,
+        Authentication authentication
+) {
+    return ResponseEntity.ok(
+            moldOrderService.getOrder(
+                    id,
+                    authentication.getName()
+            )
+    );
+}
+
+@PatchMapping("/{id}/receive")
+public ResponseEntity<MoldOrderResponse> receiveOrder(
+        @PathVariable Long id,
+        Authentication authentication
+) {
+    return ResponseEntity.ok(
+            moldOrderService.receiveOrder(
+                    id,
+                    authentication.getName()
+            )
+    );
+}
 }
