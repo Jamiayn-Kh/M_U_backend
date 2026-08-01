@@ -209,4 +209,14 @@ public void receive(User cityHandler) {
     this.receivedAt = LocalDateTime.now();
 }
 
+public void startProcessing() {
+    if (status != MoldOrderStatus.RECEIVED) {
+        throw new IllegalStateException(
+                "Зөвхөн RECEIVED төлөвтэй хүсэлтийг боловсруулж эхэлнэ"
+        );
+    }
+
+    status = MoldOrderStatus.IN_PROCESS;
+}
+
 }

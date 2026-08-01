@@ -53,24 +53,25 @@ public class SecurityConfig {
         .requestMatchers("/api/v1/users/**")
         .hasRole("ADMIN")
 
-        .requestMatchers(
-                HttpMethod.POST,
-                "/api/v1/mold-orders"
-        )
-        .hasRole("PROVINCE_SELLER")
+.requestMatchers(
+        HttpMethod.POST,
+        "/api/v1/mold-orders"
+)
+.hasRole("PROVINCE_SELLER")
 
-        .requestMatchers(
-                HttpMethod.PATCH,
-                "/api/v1/mold-orders/*/receive"
-        )
-        .hasRole("CITY_HANDLER")
+.requestMatchers(
+        HttpMethod.PATCH,
+        "/api/v1/mold-orders/*/receive",
+        "/api/v1/mold-orders/*/process"
+)
+.hasRole("CITY_HANDLER")
 
-        .requestMatchers("/api/v1/mold-orders/**")
-        .hasAnyRole(
-                "ADMIN",
-                "PROVINCE_SELLER",
-                "CITY_HANDLER"
-        )
+.requestMatchers("/api/v1/mold-orders/**")
+.hasAnyRole(
+        "ADMIN",
+        "PROVINCE_SELLER",
+        "CITY_HANDLER"
+)
 
         .anyRequest()
         .authenticated()

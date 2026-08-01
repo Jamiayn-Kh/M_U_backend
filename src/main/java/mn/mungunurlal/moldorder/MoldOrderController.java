@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 import java.util.List;
 
@@ -76,6 +77,19 @@ public ResponseEntity<MoldOrderResponse> receiveOrder(
 ) {
     return ResponseEntity.ok(
             moldOrderService.receiveOrder(
+                    id,
+                    authentication.getName()
+            )
+    );
+}
+
+@PatchMapping("/{id}/process")
+public ResponseEntity<MoldOrderResponse> startProcessing(
+        @PathVariable Long id,
+        Authentication authentication
+) {
+    return ResponseEntity.ok(
+            moldOrderService.startProcessing(
                     id,
                     authentication.getName()
             )
