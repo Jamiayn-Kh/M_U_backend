@@ -42,20 +42,31 @@ public class MoldOrderItem {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private int quantity;
+
     protected MoldOrderItem() {
         // JPA requires a no-argument constructor.
     }
 
-    public MoldOrderItem(
-            String moldCode,
-            boolean stoneRequired
-    ) {
-        String normalizedCode = normalizeMoldCode(moldCode);
+public MoldOrderItem(
+        String moldCode,
+        int quantity,
+        boolean stoneRequired
+) {
+    String normalizedCode = normalizeMoldCode(moldCode);
 
-        this.moldCode = normalizedCode;
-        this.codePrefix = normalizedCode.substring(0, 1);
-        this.stoneRequired = stoneRequired;
+    if (quantity < 1) {
+        throw new IllegalArgumentException(
+                "Тоо ширхэг хамгийн багадаа 1 байна"
+        );
     }
+
+    this.moldCode = normalizedCode;
+    this.codePrefix = normalizedCode.substring(0, 1);
+    this.quantity = quantity;
+    this.stoneRequired = stoneRequired;
+}
 
     void assignTo(MoldOrder order) {
         this.order = order;
@@ -87,6 +98,10 @@ public class MoldOrderItem {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
+    public int getQuantity() {
+    return quantity;
+}
 
     private String normalizeMoldCode(String moldCode) {
         if (moldCode == null || moldCode.isBlank()) {

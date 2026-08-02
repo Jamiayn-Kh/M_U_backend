@@ -57,6 +57,7 @@ public class MoldOrderService {
         for (MoldOrderItemRequest itemRequest : request.items()) {
             MoldOrderItem item = new MoldOrderItem(
                     itemRequest.moldCode(),
+                    itemRequest.quantity(),
                     itemRequest.stoneRequired()
             );
 

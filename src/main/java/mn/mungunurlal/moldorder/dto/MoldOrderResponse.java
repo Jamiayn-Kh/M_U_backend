@@ -76,21 +76,23 @@ public record MoldOrderResponse(
         }
     }
 
-    public record ItemInfo(
-            Long id,
-            String moldCode,
-            String codePrefix,
-            boolean stoneRequired
-    ) {
-        public static ItemInfo from(MoldOrderItem item) {
-            return new ItemInfo(
-                    item.getId(),
-                    item.getMoldCode(),
-                    item.getCodePrefix(),
-                    item.isStoneRequired()
-            );
-        }
+public record ItemInfo(
+        Long id,
+        String moldCode,
+        String codePrefix,
+        int quantity,
+        boolean stoneRequired
+) {
+    public static ItemInfo from(MoldOrderItem item) {
+        return new ItemInfo(
+                item.getId(),
+                item.getMoldCode(),
+                item.getCodePrefix(),
+                item.getQuantity(),
+                item.isStoneRequired()
+        );
     }
+}
 
     public record TransportInfo(
             LocalDate departureDate,
