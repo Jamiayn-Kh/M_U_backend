@@ -11,17 +11,35 @@ import java.util.Optional;
 public interface MoldOrderRepository
         extends JpaRepository<MoldOrder, Long> {
 
-    @EntityGraph(attributePaths = {"seller", "cityHandler", "items"})
+    @EntityGraph(attributePaths = {
+            "seller",
+            "cityHandler",
+            "items"
+    })
     List<MoldOrder> findAllByOrderByCreatedAtDesc();
 
-    @EntityGraph(attributePaths = {"seller", "cityHandler", "items"})
-    List<MoldOrder> findAllBySellerIdOrderByCreatedAtDesc(Long sellerId);
+    @EntityGraph(attributePaths = {
+            "seller",
+            "cityHandler",
+            "items"
+    })
+    List<MoldOrder> findAllBySellerIdOrderByCreatedAtDesc(
+            Long sellerId
+    );
 
-    @EntityGraph(attributePaths = {"seller", "cityHandler", "items"})
+    @EntityGraph(attributePaths = {
+            "seller",
+            "cityHandler",
+            "items"
+    })
     List<MoldOrder> findAllByStatusOrderByCreatedAtDesc(
             MoldOrderStatus status
     );
 
-    @EntityGraph(attributePaths = {"seller", "cityHandler", "items"})
+    @EntityGraph(attributePaths = {
+            "seller",
+            "cityHandler",
+            "items"
+    })
     Optional<MoldOrder> findWithDetailsById(Long id);
 }

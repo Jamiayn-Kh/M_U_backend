@@ -247,6 +247,8 @@ public void complete() {
         );
     }
 
+    items.forEach(MoldOrderItem::approveAdjustments);
+
     status = MoldOrderStatus.COMPLETED;
     completedAt = LocalDateTime.now();
 }

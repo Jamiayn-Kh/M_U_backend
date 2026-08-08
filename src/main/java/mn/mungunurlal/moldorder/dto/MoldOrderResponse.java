@@ -81,15 +81,23 @@ public record ItemInfo(
         String moldCode,
         String codePrefix,
         int quantity,
-        boolean stoneRequired
+        boolean stoneRequired,
+        List<AdjustmentResponse> adjustments
 ) {
     public static ItemInfo from(MoldOrderItem item) {
+        List<AdjustmentResponse> adjustmentResponses =
+                item.getAdjustments()
+                        .stream()
+                        .map(AdjustmentResponse::from)
+                        .toList();
+
         return new ItemInfo(
                 item.getId(),
                 item.getMoldCode(),
                 item.getCodePrefix(),
                 item.getQuantity(),
-                item.isStoneRequired()
+                item.isStoneRequired(),
+                adjustmentResponses
         );
     }
 }

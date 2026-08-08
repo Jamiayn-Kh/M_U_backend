@@ -14,6 +14,9 @@ import mn.mungunurlal.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import mn.mungunurlal.moldorder.dto.TransportOrderRequest;
+import mn.mungunurlal.moldorder.domain.MoldOrderItemAdjustment;
+import mn.mungunurlal.moldorder.dto.AdjustmentResponse;
+import mn.mungunurlal.moldorder.dto.CreateAdjustmentRequest;
 
 import java.util.HashSet;
 import java.util.List;
@@ -298,5 +301,83 @@ public MoldOrderResponse completeOrder(
     }
 
     return MoldOrderResponse.from(order);
+}
+
+@Transactional
+public AdjustmentResponse createAdjustment(
+        Long orderId,
+        Long itemId,
+        String username,
+        CreateAdjustmentRequest request
+) {
+    User cityHandler = getUser(username);
+
+    if (cityHandler.getRole() != UserRole.CITY_HANDLER) {
+        throw new InvalidMoldOrderException(
+                "Зөвхөн хотын хэрэглэгч өөрчлөлт тэмдэглэнэ"
+        );
+    }
+
+    MoldOrder order = moldOrderRepository
+            .findWithDetailsById(orderId)
+            .orElseThrow(() ->
+                    new MoldOrderNotFoundException(orderId)
+            );
+
+    if (order.getStatus()
+            != mn.mungunurlal.moldorder.domain.MoldOrderStatus.IN_PROCESS) {
+        throw new InvalidMoldOrderException(
+                "Зөвхөн IN_PROCESS төлөвтэй хүсэлтэд өөрчлөлт тэмдэглэнэ"
+        );
+    }
+
+    if (order.getCityHandler() == null
+            || !order.getCityHandler().getId()
+            .equals(cityHandler.getId())) {
+        throw new InvalidMoldOrderException(
+                "Та энэ хүсэлтийг хүлээн аваагүй байна"
+        );
+    }
+
+    MoldOrderItem item = order.getItems()
+            .stream()
+            .filter(currentItem ->
+                    currentItem.getId().equals(itemId)
+            )
+            .findFirst()
+            .orElseThrow(() ->
+                    new InvalidMoldOrderException(
+                            "Тухайн хүсэлтэд ийм хэв олдсонгүй"
+                    )
+            );
+
+    if (request.action()
+            == mn.mungunurlal.moldorder.domain.AdjustmentAction.KEEP
+            && request.finalQuantity() > item.getQuantity()) {
+        throw new InvalidMoldOrderException(
+                "KEEP тоо ширхэг анхны захиалсан хэмжээнээс их байж болохгүй"
+        );
+    }
+
+    try {
+        MoldOrderItemAdjustment adjustment =
+                new MoldOrderItemAdjustment(
+                        request.action(),
+                        request.finalMoldCode(),
+                        request.finalQuantity(),
+                        request.note(),
+                        cityHandler
+                );
+
+        item.addAdjustment(adjustment);
+
+        moldOrderRepository.flush();
+
+        return AdjustmentResponse.from(adjustment);
+    } catch (IllegalArgumentException exception) {
+        throw new InvalidMoldOrderException(
+                exception.getMessage()
+        );
+    }
 }
 }

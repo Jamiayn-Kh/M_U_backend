@@ -60,6 +60,12 @@ public class SecurityConfig {
 .hasRole("PROVINCE_SELLER")
 
 .requestMatchers(
+        HttpMethod.POST,
+        "/api/v1/mold-orders/*/items/*/adjustments"
+)
+.hasRole("CITY_HANDLER")
+
+.requestMatchers(
         HttpMethod.PATCH,
         "/api/v1/mold-orders/*/receive",
         "/api/v1/mold-orders/*/process",

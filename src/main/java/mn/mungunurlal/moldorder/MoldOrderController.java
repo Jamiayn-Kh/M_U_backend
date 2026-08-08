@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import mn.mungunurlal.moldorder.dto.TransportOrderRequest;
+import mn.mungunurlal.moldorder.dto.AdjustmentResponse;
+import mn.mungunurlal.moldorder.dto.CreateAdjustmentRequest;
 
 import java.util.List;
 
@@ -123,5 +125,25 @@ public ResponseEntity<MoldOrderResponse> completeOrder(
                     authentication.getName()
             )
     );
+}
+
+@PostMapping("/{orderId}/items/{itemId}/adjustments")
+public ResponseEntity<AdjustmentResponse> createAdjustment(
+        @PathVariable Long orderId,
+        @PathVariable Long itemId,
+        Authentication authentication,
+        @Valid @RequestBody CreateAdjustmentRequest request
+) {
+    AdjustmentResponse response =
+            moldOrderService.createAdjustment(
+                    orderId,
+                    itemId,
+                    authentication.getName(),
+                    request
+            );
+
+    return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(response);
 }
 }
