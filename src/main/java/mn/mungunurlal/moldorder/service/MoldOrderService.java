@@ -351,13 +351,7 @@ public AdjustmentResponse createAdjustment(
                     )
             );
 
-    if (request.action()
-            == mn.mungunurlal.moldorder.domain.AdjustmentAction.KEEP
-            && request.finalQuantity() > item.getQuantity()) {
-        throw new InvalidMoldOrderException(
-                "KEEP тоо ширхэг анхны захиалсан хэмжээнээс их байж болохгүй"
-        );
-    }
+
 
     try {
         MoldOrderItemAdjustment adjustment =
